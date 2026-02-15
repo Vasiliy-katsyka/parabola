@@ -2,31 +2,22 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Полный анализ параболы</title>
-    <!-- Подключаем Chart.js для графиков -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Важно для телефона -->
+    <title>Построитель Парабол 2.0</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary: #3498db;
-            --bg: #f4f6f8;
-            --card: #ffffff;
-            --text: #333333;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 10px;
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
+            color: #333;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: var(--card);
+            background: white;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -42,156 +33,142 @@
         /* Адаптивный ввод */
         .input-group {
             margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            text-align: center;
         }
 
         .input-wrapper {
             display: flex;
             align-items: center;
-            width: 100%;
-            margin-bottom: 15px;
+            justify-content: center;
             font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .input-wrapper span {
-            margin-right: 10px;
-            white-space: nowrap;
+            margin-bottom: 15px;
+            flex-wrap: wrap; /* Чтобы переносилось на телефоне */
         }
 
         input[type="text"] {
             font-size: 1.1rem;
             padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            width: 100%;
-            font-family: 'Courier New', monospace;
+            border: 2px solid #dfe1e5;
+            border-radius: 8px;
+            width: 280px;
+            margin: 5px 10px;
+            font-family: 'Courier New', Courier, monospace;
             outline: none;
             transition: border 0.3s;
         }
 
         input[type="text"]:focus {
-            border-color: var(--primary);
+            border-color: #3498db;
         }
 
-        /* Клавиатура для мобилок */
+        /* Клавиатура */
         .keyboard {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            display: flex;
+            justify-content: center;
             gap: 8px;
-            width: 100%;
+            flex-wrap: wrap; /* Кнопки переносятся */
             margin-bottom: 20px;
         }
 
         .key-btn {
-            background: #e1e8ed;
-            border: none;
-            padding: 12px 0;
+            background: #eef2f5;
+            border: 1px solid #ced4da;
+            padding: 12px 15px;
             font-size: 1.1rem;
             border-radius: 8px;
             cursor: pointer;
-            touch-action: manipulation; /* Убирает задержку тапа */
-            font-weight: 500;
-            color: #444;
+            min-width: 50px;
+            touch-action: manipulation; /* Улучшает отклик на телефоне */
+            user-select: none;
         }
 
         .key-btn:active {
-            background: #d0dbe2;
-            transform: scale(0.96);
+            background: #dce2e6;
+            transform: scale(0.95);
         }
 
         .key-btn.action {
-            background: var(--primary);
+            background: #3498db;
             color: white;
-            grid-column: span 2; /* Кнопка Построить шире */
+            border: none;
             font-weight: bold;
+            width: 100%;
+            max-width: 200px;
+            margin-top: 5px;
         }
 
-        /* Блоки решения */
+        /* Результаты */
         .solution-step {
-            background: #fdfdfd;
-            border-left: 4px solid var(--primary);
+            background: #fff;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .solution-step h3 {
             margin-top: 0;
             color: #2980b9;
             font-size: 1.1rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-        }
-
-        .math-prop {
-            margin: 8px 0;
-            line-height: 1.5;
         }
 
         .math-expr {
             font-family: 'Courier New', monospace;
             font-weight: bold;
-            background: #eee;
+            background: #f8f9fa;
             padding: 2px 6px;
             border-radius: 4px;
-            white-space: nowrap;
+            color: #d63384;
         }
 
         /* Таблица */
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-top: 10px;
+        .table-container {
+            overflow-x: auto; /* Прокрутка таблицы на телефоне */
+            margin-bottom: 10px;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
             min-width: 300px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px 4px;
-            text-align: center;
+            border-collapse: collapse;
             font-size: 0.9rem;
         }
 
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: center;
+        }
+
         th {
-            background-color: var(--primary);
-            color: white;
+            background-color: #f1f3f5;
         }
 
         /* График */
         .chart-container {
             position: relative;
-            height: 350px; /* Фиксированная высота для мобилок */
+            height: 350px;
             width: 100%;
+            margin-top: 20px;
         }
 
         .error {
-            background: #fde8e7;
-            color: #e74c3c;
+            color: #dc3545;
+            text-align: center;
+            font-weight: bold;
+            background: #ffe6e6;
             padding: 10px;
             border-radius: 8px;
-            text-align: center;
         }
 
-        /* Мобильная адаптация */
+        /* Мобильные стили */
         @media (max-width: 480px) {
-            .container {
-                padding: 15px;
-            }
-            .keyboard {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            input[type="text"] {
-                font-size: 1rem;
-            }
+            .container { padding: 15px; }
+            .input-wrapper { flex-direction: column; }
+            input[type="text"] { width: 100%; box-sizing: border-box; }
+            .key-btn { flex: 1 1 20%; } /* Кнопки растягиваются */
+            .key-btn.action { flex: 1 1 100%; }
         }
     </style>
 </head>
@@ -203,20 +180,19 @@
     <div class="input-group">
         <div class="input-wrapper">
             <span>y = </span>
-            <input type="text" id="funcInput" placeholder="x^2 - 4x + 3" value="x^2 - 4x + 3">
+            <input type="text" id="funcInput" placeholder="x^2 - 4x + 3" value="x^2 - 4x + 3" inputmode="none">
         </div>
         
         <div class="keyboard">
             <button class="key-btn" onclick="addToInput('x')">x</button>
             <button class="key-btn" onclick="addToInput('^2')">x²</button>
             <button class="key-btn" onclick="addToInput('1/2')">½</button>
-            <button class="key-btn" onclick="addToInput('+')">+</button>
-            <button class="key-btn" onclick="addToInput('-')">-</button>
             <button class="key-btn" onclick="addToInput('(')">(</button>
             <button class="key-btn" onclick="addToInput(')')">)</button>
+            <button class="key-btn" onclick="addToInput('+')">+</button>
+            <button class="key-btn" onclick="addToInput('-')">-</button>
             <button class="key-btn" onclick="backspace()">⌫</button>
-            <button class="key-btn action" onclick="solveAndDraw()">ИССЛЕДОВАТЬ</button>
-            <button class="key-btn" onclick="clearInput()">C</button>
+            <button class="key-btn action" onclick="solveAndDraw()">ИССЛЕДОВАТЬ И ПОСТРОИТЬ</button>
         </div>
     </div>
 
@@ -230,35 +206,33 @@
 <script>
     let myChart = null;
 
-    // --- Функции клавиатуры ---
+    // Ввод символов
     function addToInput(val) {
         const input = document.getElementById('funcInput');
         input.value += val;
-        // На мобильных не ставим фокус автоматически, чтобы не вылезала системная клавиатура
+        // На мобильном не вызываем фокус, чтобы не вылезала системная клавиатура
+        // input.focus(); 
     }
 
+    // Удаление последнего символа
     function backspace() {
         const input = document.getElementById('funcInput');
         input.value = input.value.slice(0, -1);
     }
-    
-    function clearInput() {
-        document.getElementById('funcInput').value = '';
-    }
 
-    // --- Математическая логика ---
-    
-    function parseFunction(expression) {
-        // Подготовка строки для JS
-        let jsExpr = expression.replace(/\^/g, '**'); // заменяем степень
-        jsExpr = jsExpr.replace(/(\d)([a-z\(])/g, '$1*$2'); // добавляем умножение 2x -> 2*x
+    // Парсер функции (превращает строку в коэффициенты a, b, c)
+    function getCoefficients(expression) {
+        // Замена ^ на ** и 2x на 2*x
+        let jsExpr = expression.replace(/\^/g, '**');
+        jsExpr = jsExpr.replace(/(\d)([a-z])/g, '$1*$2'); 
         jsExpr = jsExpr.replace(/\)\(/g, ')*(');
 
         try {
-            // Создаем функцию f(x)
-            const f = (x) => new Function('x', `return ${jsExpr}`)(x);
+            const f = (x) => {
+                return new Function('x', `return ${jsExpr}`)(x);
+            };
 
-            // Вычисляем коэффициенты a, b, c через точки
+            // Вычисляем a, b, c через значения в точках 0, 1, -1
             const c = f(0);
             const f1 = f(1);
             const fm1 = f(-1);
@@ -272,205 +246,201 @@
         }
     }
 
-    function format(n) {
-        // Убираем лишние нули после запятой (2.00 -> 2, 2.33333 -> 2.33)
-        return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
+    function formatNum(n) {
+        if (Math.abs(n) < 0.000001) return 0;
+        return Number.isInteger(n) ? n : n.toFixed(2);
     }
 
     function solveAndDraw() {
         const inputStr = document.getElementById('funcInput').value;
-        const resDiv = document.getElementById('results');
+        const resultsDiv = document.getElementById('results');
 
-        resDiv.innerHTML = ''; // Очистка
+        resultsDiv.innerHTML = ''; // Очистка
 
-        const data = parseFunction(inputStr);
-        
-        if (!data || isNaN(data.a)) {
-            resDiv.innerHTML = '<div class="error">Ошибка ввода! Проверьте формулу.</div>';
+        // 1. Парсинг
+        const coeffs = getCoefficients(inputStr);
+        if (!coeffs || isNaN(coeffs.a)) {
+            resultsDiv.innerHTML = '<p class="error">Ошибка ввода! Проверьте формулу.</p>';
             return;
         }
 
-        const { a, b, c, f } = data;
+        const { a, b, c, f } = coeffs;
 
-        if (Math.abs(a) < 0.000001) {
-            resDiv.innerHTML = '<div class="error">Это линейная функция (a=0). Нужна квадратичная.</div>';
+        if (Math.abs(a) < 0.0001) {
+            resultsDiv.innerHTML = '<p class="error">Это не парабола (a = 0).</p>';
             return;
         }
 
-        // Расчеты
-        const x0 = -b / (2 * a);
-        const y0 = f(x0);
-        const D = b*b - 4*a*c;
-        let roots = [];
-        
-        if (D > 0) {
-            roots.push((-b - Math.sqrt(D))/(2*a));
-            roots.push((-b + Math.sqrt(D))/(2*a));
-            roots.sort((u, v) => u - v); // Сортируем по возрастанию
-        } else if (D === 0) {
-            roots.push(-b/(2*a));
-        }
-
-        // --- ГЕНЕРАЦИЯ HTML ---
         let html = '';
 
-        // 1. Ветви
+        // --- ШАГ 1: Ветви ---
         html += `<div class="solution-step">
             <h3>1. Направление ветвей</h3>
-            <div class="math-prop">Коэффициент a = ${format(a)}.</div>
-            <div class="math-prop">${a > 0 ? 'a > 0, <b>ветви вверх</b> ∪' : 'a < 0, <b>ветви вниз</b> ∩'}</div>
+            <p>a = ${formatNum(a)}. ${a > 0 ? 'Так как a > 0, <b>ветви вверх</b> ⬆' : 'Так как a < 0, <b>ветви вниз</b> ⬇'}</p>
         </div>`;
 
-        // 2. Вершина и Ось
+        // --- ШАГ 2: Вершина ---
+        const x0 = -b / (2 * a);
+        const y0 = f(x0);
+        
         html += `<div class="solution-step">
-            <h3>2. Вершина параболы и ось</h3>
-            <div class="math-prop">x₀ = -b/2a = ${format(x0)}</div>
-            <div class="math-prop">y₀ = y(${format(x0)}) = ${format(y0)}</div>
-            <div class="math-prop">Вершина: <b>(${format(x0)}; ${format(y0)})</b></div>
-            <div class="math-prop">Ось симметрии: <b>x = ${format(x0)}</b></div>
+            <h3>2. Координаты вершины</h3>
+            <p>x₀ = -b / 2a = ${formatNum(x0)}</p>
+            <p>y₀ = y(${formatNum(x0)}) = ${formatNum(y0)}</p>
+            <p>Вершина: <b>(${formatNum(x0)}; ${formatNum(y0)})</b></p>
         </div>`;
 
-        // 3. Область определения и Значений
-        let rangeText = '';
-        if (a > 0) rangeText = `E(y) = [${format(y0)}; +∞)`;
-        else rangeText = `E(y) = (-∞; ${format(y0)}]`;
-
+        // --- ШАГ 3: Ось симметрии ---
         html += `<div class="solution-step">
-            <h3>3. Области определения и значений</h3>
-            <div class="math-prop"><b>D(y) = (-∞; +∞)</b> (x — любое число)</div>
-            <div class="math-prop"><b>${rangeText}</b></div>
+            <h3>3. Ось симметрии</h3>
+            <p>Прямая <b>x = ${formatNum(x0)}</b></p>
         </div>`;
 
-        // 4. Нули функции
-        let zeroText = '';
-        if (roots.length === 2) zeroText = `Два корня: x₁ ≈ ${format(roots[0])}, x₂ ≈ ${format(roots[1])}`;
-        else if (roots.length === 1) zeroText = `Один корень: x = ${format(roots[0])}`;
-        else zeroText = `Корней нет (нет пересечения с осью X)`;
+        // --- ШАГ 4: Точки пересечения (x=0, y=0) ---
+        // y = 0 (Корни)
+        const D = b*b - 4*a*c;
+        let rootsText = '';
+        let x1 = null, x2 = null;
 
-        html += `<div class="solution-step">
-            <h3>4. Нули функции (y = 0)</h3>
-            <div class="math-prop">Решаем ${format(a)}x² + ${format(b)}x + ${format(c)} = 0</div>
-            <div class="math-prop">Дискриминант D = ${format(D)}</div>
-            <div class="math-prop"><b>${zeroText}</b></div>
-        </div>`;
-
-        // 5. Промежутки знакопостоянства
-        let signText = '';
-        if (a > 0) {
-            if (roots.length === 2) {
-                signText = `y > 0 при x ∈ (-∞; ${format(roots[0])}) ∪ (${format(roots[1])}; +∞)<br>
-                            y < 0 при x ∈ (${format(roots[0])}; ${format(roots[1])})`;
-            } else if (roots.length === 1) {
-                signText = `y > 0 при x ∈ (-∞; ${format(roots[0])}) ∪ (${format(roots[0])}; +∞)<br>y никогда не < 0`;
-            } else {
-                signText = `y > 0 при любом x<br>y никогда не < 0`;
-            }
-        } else { // a < 0
-            if (roots.length === 2) {
-                signText = `y > 0 при x ∈ (${format(roots[0])}; ${format(roots[1])})<br>
-                            y < 0 при x ∈ (-∞; ${format(roots[0])}) ∪ (${format(roots[1])}; +∞)`;
-            } else if (roots.length === 1) {
-                signText = `y < 0 при x ∈ (-∞; ${format(roots[0])}) ∪ (${format(roots[0])}; +∞)<br>y никогда не > 0`;
-            } else {
-                signText = `y < 0 при любом x`;
-            }
-        }
-
-        html += `<div class="solution-step">
-            <h3>5. Промежутки знакопостоянства</h3>
-            <div class="math-prop">${signText}</div>
-        </div>`;
-
-        // 6. Монотонность (возрастание/убывание)
-        let monoText = '';
-        if (a > 0) {
-            monoText = `Убывает (↓) при x ∈ (-∞; ${format(x0)}] <br>
-                        Возрастает (↑) при x ∈ [${format(x0)}; +∞)`;
+        if (D > 0) {
+            x1 = (-b - Math.sqrt(D)) / (2*a);
+            x2 = (-b + Math.sqrt(D)) / (2*a);
+            // Сортируем для удобства интервалов
+            if (x1 > x2) [x1, x2] = [x2, x1]; 
+            rootsText = `D > 0. Два корня: x₁ ≈ <b>${formatNum(x1)}</b>, x₂ ≈ <b>${formatNum(x2)}</b>`;
+        } else if (Math.abs(D) < 0.0000001) {
+            x1 = -b / (2*a);
+            rootsText = `D = 0. Один корень: x = <b>${formatNum(x1)}</b>`;
         } else {
-            monoText = `Возрастает (↑) при x ∈ (-∞; ${format(x0)}] <br>
-                        Убывает (↓) при x ∈ [${format(x0)}; +∞)`;
+            rootsText = `D < 0. Корней нет (нет пересечения с осью X).`;
         }
 
         html += `<div class="solution-step">
-            <h3>6. Возрастание и убывание</h3>
-            <div class="math-prop">${monoText}</div>
+            <h3>4. Пересечение с осями</h3>
+            <p>• С осью Y (x=0): y = ${formatNum(c)}. Точка (0; ${formatNum(c)})</p>
+            <p>• С осью X (y=0): ${rootsText}</p>
         </div>`;
 
-        // 7. Таблица
+        // --- ШАГ 5: Таблица ---
         let tableHtml = '<table><tr><th>x</th>';
         let rowY = '<tr><th>y</th>';
         
         // Берем целые точки вокруг вершины
-        const start = Math.floor(x0) - 2;
-        const end = Math.ceil(x0) + 2;
+        const startInt = Math.floor(x0) - 3;
+        const endInt = Math.floor(x0) + 3;
         
-        for (let k = start; k <= end; k++) {
+        for (let k = startInt; k <= endInt; k++) {
             tableHtml += `<td>${k}</td>`;
-            rowY += `<td>${format(f(k))}</td>`;
+            rowY += `<td>${formatNum(f(k))}</td>`;
         }
         tableHtml += '</tr>' + rowY + '</tr></table>';
 
         html += `<div class="solution-step">
-            <h3>7. Таблица значений</h3>
-            <div class="table-wrapper">${tableHtml}</div>
+            <h3>5. Таблица значений</h3>
+            <div class="table-container">${tableHtml}</div>
         </div>`;
 
-        resDiv.innerHTML = html;
+        // --- ШАГ 6: СВОЙСТВА ФУНКЦИИ (НОВОЕ) ---
+        
+        // E(y) - Область значений
+        let rangeText = '';
+        if (a > 0) rangeText = `[${formatNum(y0)}; +∞)`;
+        else rangeText = `(-∞; ${formatNum(y0)}]`;
 
-        // Построение графика
-        drawChart(a, x0, f);
+        // Знакопостоянство
+        let signText = '';
+        if (D < 0) {
+             // Парабола висит в воздухе
+             if (a > 0) signText = `y > 0 при x ∈ (-∞; +∞)`;
+             else signText = `y < 0 при x ∈ (-∞; +∞)`;
+        } else if (Math.abs(D) < 0.0001) {
+             // Касается оси
+             if (a > 0) signText = `y > 0 при x ∈ (-∞; ${formatNum(x1)}) ∪ (${formatNum(x1)}; +∞)`;
+             else signText = `y < 0 при x ∈ (-∞; ${formatNum(x1)}) ∪ (${formatNum(x1)}; +∞)`;
+        } else {
+             // Пересекает ось (x1 < x2)
+             if (a > 0) {
+                 signText = `<br>y > 0 при x ∈ (-∞; ${formatNum(x1)}) ∪ (${formatNum(x2)}; +∞)<br>
+                             y < 0 при x ∈ (${formatNum(x1)}; ${formatNum(x2)})`;
+             } else {
+                 signText = `<br>y > 0 при x ∈ (${formatNum(x1)}; ${formatNum(x2)})<br>
+                             y < 0 при x ∈ (-∞; ${formatNum(x1)}) ∪ (${formatNum(x2)}; +∞)`;
+             }
+        }
+
+        // Монотонность
+        let monoText = '';
+        if (a > 0) {
+            monoText = `<br>Функция убывает ↓ при x ∈ (-∞; ${formatNum(x0)}]<br>
+                        Функция возрастает ↑ при x ∈ [${formatNum(x0)}; +∞)`;
+        } else {
+            monoText = `<br>Функция возрастает ↑ при x ∈ (-∞; ${formatNum(x0)}]<br>
+                        Функция убывает ↓ при x ∈ [${formatNum(x0)}; +∞)`;
+        }
+
+        html += `<div class="solution-step">
+            <h3>6. Свойства функции</h3>
+            <p><b>D(y)</b> (Область определения): (-∞; +∞)</p>
+            <p><b>E(y)</b> (Область значений): ${rangeText}</p>
+            <p><b>Нули функции:</b> ${rootsText.replace(/<[^>]*>/g, '').split(':')[1] || 'нет'}</p>
+            <p><b>Промежутки знакопостоянства:</b> ${signText}</p>
+            <p><b>Монотонность:</b> ${monoText}</p>
+        </div>`;
+
+        resultsDiv.innerHTML = html;
+
+        // --- ГРАФИК ---
+        // Генерируем данные для chart.js
+        let graphDataX = [];
+        let graphDataY = [];
+        for(let i = x0 - 5; i <= x0 + 5; i += 0.2) {
+            graphDataX.push(i.toFixed(1));
+            graphDataY.push(f(i));
+        }
+
+        drawChart(graphDataX, graphDataY, a, x0, y0);
     }
 
-    function drawChart(a, x0, f) {
-        const ctx = document.getElementById('parabolaChart');
+    function drawChart(labels, data, a, x0, y0) {
+        const ctx = document.getElementById('parabolaChart').getContext('2d');
+
         if (myChart) myChart.destroy();
-
-        // Генерируем точки для плавного графика
-        let labels = [];
-        let dataPoints = [];
-        // Диапазон отображения (вершина +/- 5 единиц)
-        const range = 5;
-        const step = 0.2; // Шаг для плавности
-
-        for (let x = x0 - range; x <= x0 + range; x += step) {
-            labels.push(x.toFixed(1));
-            dataPoints.push(f(x));
-        }
 
         myChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: `y = ${a>0?'+':''}${format(a)}x²...`,
-                    data: dataPoints,
+                    label: 'y = f(x)',
+                    data: data,
                     borderColor: '#3498db',
                     backgroundColor: 'rgba(52, 152, 219, 0.1)',
                     borderWidth: 2,
-                    pointRadius: 0, // Скрываем точки для чистоты линии
-                    pointHoverRadius: 5,
+                    pointRadius: 1,
                     fill: true,
-                    tension: 0.4 // Сглаживание
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
+                plugins: {
+                    tooltip: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    annotation: {
+                        // Для Chart.js нужен плагин аннотаций, но мы обойдемся базовым
+                    }
                 },
                 scales: {
                     x: {
-                        grid: { color: (ctx) => ctx.tick.value == 0 ? '#333' : '#eee' }, // Ось Y пожирнее (визуально)
-                        ticks: { maxTicksLimit: 8 }
+                        grid: { color: (context) => context.tick.value == 0 ? '#333' : '#ddd', lineWidth: (context) => context.tick.value == 0 ? 2 : 1 },
+                        ticks: { maxTicksLimit: 10 }
                     },
                     y: {
-                        grid: { color: (ctx) => ctx.tick.value == 0 ? '#333' : '#eee' } // Ось X пожирнее
+                        grid: { color: (context) => context.tick.value == 0 ? '#333' : '#ddd', lineWidth: (context) => context.tick.value == 0 ? 2 : 1 }
                     }
-                },
-                plugins: {
-                    legend: { display: false }
                 }
             }
         });
