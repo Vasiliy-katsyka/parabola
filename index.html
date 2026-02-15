@@ -2,397 +2,379 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Настройка масштаба, чтобы на телефоне все было крупно и удобно -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Построитель Парабол</title>
+    <title>Анализ Квадратичной Функции</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 10px;
-            color: #333;
-            -webkit-tap-highlight-color: transparent; /* Убирает синюю подсветку при нажатии на телефоне */
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
-            background: white;
+            background: var(--card);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
         h1 {
             text-align: center;
-            color: #2c3e50;
             font-size: 1.4rem;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            color: var(--primary);
         }
 
         /* Поле ввода */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .input-wrapper {
+        .input-box {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 16px;
             margin-bottom: 15px;
-            flex-wrap: wrap;
         }
 
-        input[type="text"] {
-            font-size: 1.2rem; /* Крупный шрифт для телефона */
-            padding: 10px;
-            border: 2px solid #3498db;
-            border-radius: 8px;
+        .input-box span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        input {
             width: 100%;
-            max-width: 300px;
-            margin: 5px;
-            font-family: 'Courier New', Courier, monospace;
+            border: none;
+            background: transparent;
+            font-size: 1.3rem;
+            font-family: 'Courier New', monospace;
             outline: none;
         }
 
-        /* Кнопки ввода */
+        /* Клавиатура */
         .keyboard {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            flex-wrap: wrap; /* Чтобы кнопки переносились в несколько рядов */
-            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
-        .key-btn {
-            background: #eef2f5;
-            border: 1px solid #ced4da;
-            padding: 10px 0;
-            width: 45px; /* Фиксированная ширина для удобства пальцев */
-            font-size: 1.1rem;
-            border-radius: 8px;
+        .key {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 15px 5px;
+            font-size: 1.2rem;
+            border-radius: 12px;
             cursor: pointer;
+            transition: all 0.1s;
             touch-action: manipulation;
-            font-weight: bold;
-            color: #495057;
+            font-weight: 500;
         }
 
-        .key-btn:active {
-            background: #dce2e6;
-            transform: translateY(2px);
+        .key:active {
+            background: #e2e8f0;
+            transform: scale(0.95);
         }
 
-        .key-btn.action {
-            background: #3498db;
+        .key.action {
+            grid-column: span 4;
+            background: var(--primary);
             color: white;
             border: none;
-            width: 100%; /* Кнопка во всю ширину */
-            max-width: 300px;
-            margin-top: 10px;
-            padding: 15px;
-            text-transform: uppercase;
-            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 5px;
         }
 
-        /* Блоки решения */
-        .solution-step {
-            background: #fff;
-            border-left: 5px solid #3498db;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        .key.red { color: #ef4444; }
+
+        /* Стили вывода */
+        .step {
+            background: #fdfdfd;
+            border-left: 5px solid var(--primary);
             padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .solution-step h3 {
-            margin-top: 0;
-            color: #2980b9;
+        .step h3 {
+            margin: 0 0 10px 0;
             font-size: 1.1rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step p { margin: 5px 0; }
+
+        .highlight {
+            font-weight: bold;
+            color: #000;
         }
 
         /* Таблица */
         .table-container {
             overflow-x: auto;
-            margin-bottom: 10px;
-            -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+            margin-top: 10px;
         }
 
         table {
             width: 100%;
-            min-width: 300px;
             border-collapse: collapse;
-            font-size: 0.9rem;
         }
 
-        th, td {
-            border: 1px solid #dee2e6;
-            padding: 8px;
+        td, th {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
             text-align: center;
         }
 
-        th {
-            background-color: #f8f9fa;
-        }
+        th { background: #f1f5f9; }
 
-        /* График */
-        .chart-container {
-            position: relative;
-            height: 300px; /* Чуть меньше для телефона */
-            width: 100%;
+        .chart-wrap {
+            height: 350px;
             margin-top: 20px;
         }
 
         .error {
-            color: #dc3545;
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 15px;
+            border-radius: 12px;
             text-align: center;
             font-weight: bold;
-            background: #ffe6e6;
-            padding: 10px;
-            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Построитель Парабол</h1>
+    <h1>Исследование параболы</h1>
 
-    <div class="input-group">
-        <div class="input-wrapper">
-            <b>y = </b>
-            <!-- Убрал inputmode="none", теперь клавиатура телефона работает -->
-            <input type="text" id="funcInput" placeholder="x^2 - 4x + 3" value="x^2 - 4x + 3">
-        </div>
-        
-        <!-- Дополнительные кнопки для удобства -->
-        <div class="keyboard">
-            <button class="key-btn" onclick="addToInput('x')">x</button>
-            <button class="key-btn" onclick="addToInput('^2')">x²</button>
-            <button class="key-btn" onclick="addToInput('1/2')">½</button>
-            <button class="key-btn" onclick="addToInput('+')">+</button>
-            <button class="key-btn" onclick="addToInput('-')">-</button>
-            <button class="key-btn" onclick="addToInput('(')">(</button>
-            <button class="key-btn" onclick="addToInput(')')">)</button>
-            <button class="key-btn" onclick="backspace()" style="color:red">⌫</button>
-            
-            <button class="key-btn action" onclick="solveAndDraw()">ПОСТРОИТЬ ГРАФИК</button>
-        </div>
+    <div class="input-box">
+        <span>y =</span>
+        <input type="text" id="funcInput" value="-x^2 + 6x - 9" placeholder="Введите формулу">
     </div>
 
-    <div id="results"></div>
+    <div class="keyboard">
+        <button class="key" onclick="add('x')">x</button>
+        <button class="key" onclick="add('^2')">x²</button>
+        <button class="key" onclick="add('1/2')">½</button>
+        <button class="key" onclick="add('+')">+</button>
+        <button class="key" onclick="add('-')">−</button>
+        <button class="key" onclick="add('(')">(</button>
+        <button class="key" onclick="add(')')">)</button>
+        <button class="key red" onclick="back()">⌫</button>
+        <button class="key action" onclick="calculate()">ПОСТРОИТЬ И ИССЛЕДОВАТЬ</button>
+    </div>
 
-    <div class="chart-container">
-        <canvas id="parabolaChart"></canvas>
+    <div id="resultArea"></div>
+
+    <div class="chart-wrap">
+        <canvas id="mainChart"></canvas>
     </div>
 </div>
 
 <script>
     let myChart = null;
 
-    function addToInput(val) {
-        const input = document.getElementById('funcInput');
-        // Вставляем текст в конец
-        input.value += val;
-        // Не вызываем input.focus(), чтобы экранная клавиатура не прыгала
+    function add(v) { document.getElementById('funcInput').value += v; }
+    function back() { 
+        let current = document.getElementById('funcInput').value;
+        document.getElementById('funcInput').value = current.slice(0, -1);
     }
 
-    function backspace() {
-        const input = document.getElementById('funcInput');
-        input.value = input.value.slice(0, -1);
-    }
-
-    // --- Математическая логика (как была) ---
-    function getCoefficients(expression) {
-        // Замена ^ на ** и 2x на 2*x
-        let jsExpr = expression.replace(/\^/g, '**');
-        jsExpr = jsExpr.replace(/(\d)([a-z])/g, '$1*$2'); 
-        jsExpr = jsExpr.replace(/\)\(/g, ')*(');
+    // Парсер для извлечения коэффициентов a, b, c
+    function parseFunction(str) {
+        let expression = str.replace(/ /g, '')
+                            .replace(/½/g, '0.5')
+                            .replace(/\^2/g, '**2');
+        
+        // Исправляем -x**2 на -1*(x**2) для JS и добавляем умножение
+        expression = expression.replace(/-x/g, '-1*x');
+        expression = expression.replace(/(\d)x/g, '$1*x');
 
         try {
-            const f = (x) => {
-                return new Function('x', `return ${jsExpr}`)(x);
-            };
+            const f = (x) => new Function('x', `return ${expression}`)(x);
+            const y0 = f(0);
+            const y1 = f(1);
+            const yn1 = f(-1);
 
-            const c = f(0);
-            const f1 = f(1);
-            const fm1 = f(-1);
+            const c = y0;
+            const a = (y1 + yn1 - 2 * c) / 2;
+            const b = y1 - a - c;
 
-            const a = (f1 + fm1 - 2*c) / 2;
-            const b = f1 - a - c;
-
+            if (isNaN(a)) return null;
             return { a, b, c, f };
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
-    function formatNum(n) {
-        if (Math.abs(n) < 0.000001) return 0;
+    function format(n) {
+        if (Math.abs(n) < 0.001) return 0;
         return Number.isInteger(n) ? n : n.toFixed(2);
     }
 
-    function solveAndDraw() {
-        const inputStr = document.getElementById('funcInput').value;
-        const resultsDiv = document.getElementById('results');
+    function calculate() {
+        const input = document.getElementById('funcInput').value;
+        const area = document.getElementById('resultArea');
+        area.innerHTML = "";
 
-        resultsDiv.innerHTML = '';
+        const res = parseFunction(input);
 
-        const coeffs = getCoefficients(inputStr);
-        if (!coeffs || isNaN(coeffs.a)) {
-            resultsDiv.innerHTML = '<p class="error">Ошибка! Проверьте формулу.</p>';
+        if (!res || Math.abs(res.a) < 0.0001) {
+            area.innerHTML = '<div class="error">Ошибка в формуле. Убедитесь, что это квадратичная функция (есть x²)</div>';
             return;
         }
 
-        const { a, b, c, f } = coeffs;
-
-        if (Math.abs(a) < 0.0001) {
-            resultsDiv.innerHTML = '<p class="error">Это линейная функция, а не парабола (a = 0).</p>';
-            return;
-        }
-
-        let html = '';
-
-        // 1. Ветви
-        html += `<div class="solution-step">
-            <h3>1. Направление ветвей</h3>
-            <p>a = ${formatNum(a)}. ${a > 0 ? 'Так как a > 0, <b>ветви вверх</b> ⬆' : 'Так как a < 0, <b>ветви вниз</b> ⬇'}</p>
-        </div>`;
-
-        // 2. Вершина
+        const { a, b, c, f } = res;
         const x0 = -b / (2 * a);
         const y0 = f(x0);
-        
-        html += `<div class="solution-step">
-            <h3>2. Координаты вершины</h3>
-            <p>x₀ = -b / 2a = ${formatNum(x0)}</p>
-            <p>y₀ = ${formatNum(y0)}</p>
-            <p>Вершина: <b>(${formatNum(x0)}; ${formatNum(y0)})</b></p>
+        const D = b * b - 4 * a * c;
+
+        let html = "";
+
+        // 1. Направление ветвей
+        html += `<div class="step">
+            <h3>1. Направление ветвей</h3>
+            <p>Коэффициент <span class="highlight">a = ${format(a)}</span>.</p>
+            <p>Так как коэффициент a ${a > 0 ? 'больше нуля' : 'меньше нуля'}, <b>ветви параболы направлены ${a > 0 ? 'вверх' : 'вниз'}</b>.</p>
         </div>`;
 
-        // 3. Ось симметрии
-        html += `<div class="solution-step">
-            <h3>3. Ось симметрии</h3>
-            <p>x = ${formatNum(x0)}</p>
+        // 2. Вершина и ось
+        html += `<div class="step">
+            <h3>2. Координаты вершины и ось симметрии</h3>
+            <p>Абсцисса вершины (x₀) = -b / 2a = ${format(-b)} / ${format(2*a)} = <span class="highlight">${format(x0)}</span></p>
+            <p>Ордината вершины (y₀) = f(x₀) = <span class="highlight">${format(y0)}</span></p>
+            <p>Координаты вершины параболы: <span class="highlight">(${format(x0)}; ${format(y0)})</span></p>
+            <p>Ось симметрии параболы: прямая <span class="highlight">x = ${format(x0)}</span></p>
         </div>`;
 
-        // 4. Корни
-        const D = b*b - 4*a*c;
-        let rootsText = '';
-        let x1 = null, x2 = null;
-
+        // 3. Пересечение с осями
+        let xPoints = "";
+        let roots = [];
         if (D > 0) {
-            x1 = (-b - Math.sqrt(D)) / (2*a);
-            x2 = (-b + Math.sqrt(D)) / (2*a);
-            if (x1 > x2) [x1, x2] = [x2, x1];
-            rootsText = `D > 0. Корни: x₁ ≈ <b>${formatNum(x1)}</b>, x₂ ≈ <b>${formatNum(x2)}</b>`;
-        } else if (Math.abs(D) < 0.0001) {
-            x1 = -b / (2*a);
-            rootsText = `D = 0. Корень: x = <b>${formatNum(x1)}</b>`;
+            let x1 = (-b + Math.sqrt(D)) / (2 * a);
+            let x2 = (-b - Math.sqrt(D)) / (2 * a);
+            roots = [x1, x2].sort((m, n) => m - n);
+            xPoints = `функция имеет два нуля: x₁ = ${format(roots[0])}, x₂ = ${format(roots[1])}`;
+        } else if (Math.abs(D) < 0.001) {
+            roots = [x0];
+            xPoints = `функция имеет один нуль: x = ${format(x0)}`;
         } else {
-            rootsText = `D < 0. Корней нет.`;
+            xPoints = "график не пересекает ось абсцисс (нулей нет)";
         }
 
-        html += `<div class="solution-step">
-            <h3>4. Пересечение с осями</h3>
-            <p>• Ось Y (x=0): y = ${formatNum(c)}</p>
-            <p>• Ось X (y=0): ${rootsText}</p>
+        html += `<div class="step">
+            <h3>3. Точки пересечения с осями</h3>
+            <p><b>С осью ординат (x = 0):</b> точка (0; ${format(c)})</p>
+            <p><b>С осью абсцисс (y = 0):</b> ${xPoints}</p>
         </div>`;
 
-        // 5. Таблица
-        let tableHtml = '<table><tr><th>x</th>';
-        let rowY = '<tr><th>y</th>';
-        const startInt = Math.floor(x0) - 3;
-        const endInt = Math.floor(x0) + 3;
+        // 4. Полное исследование свойств
+        let range = a > 0 ? `[${format(y0)}; +∞)` : `(-∞; ${format(y0)}]`;
+        let increase = a > 0 ? `[${format(x0)}; +∞)` : `(-∞; ${format(x0)}]`;
+        let decrease = a > 0 ? `(-∞; ${format(x0)}]` : `[${format(x0)}; +∞)`;
         
-        for (let k = startInt; k <= endInt; k++) {
-            tableHtml += `<td>${k}</td>`;
-            rowY += `<td>${formatNum(f(k))}</td>`;
+        let posNeg = "";
+        if (D > 0) {
+            if (a > 0) {
+                posNeg = `<p>y > 0 (выше оси) на промежутках: (-∞; ${format(roots[0])}) ∪ (${format(roots[1])}; +∞)</p>
+                          <p>y < 0 (ниже оси) на промежутке: (${format(roots[0])}; ${format(roots[1])})</p>`;
+            } else {
+                posNeg = `<p>y > 0 (выше оси) на промежутке: (${format(roots[0])}; ${format(roots[1])})</p>
+                          <p>y < 0 (ниже оси) на промежутках: (-∞; ${format(roots[0])}) ∪ (${format(roots[1])}; +∞)</p>`;
+            }
+        } else {
+            let sign = a > 0 ? "положительна (y > 0)" : "отрицательна (y < 0)";
+            posNeg = `<p>Функция ${sign} на всей области определения ${D === 0 ? '(кроме вершины)' : ''}.</p>`;
         }
-        tableHtml += '</tr>' + rowY + '</tr></table>';
 
-        html += `<div class="solution-step">
-            <h3>5. Таблица значений</h3>
-            <div class="table-container">${tableHtml}</div>
+        html += `<div class="step">
+            <h3>4. Свойства функции</h3>
+            <p><b>Область определения:</b> (-∞; +∞)</p>
+            <p><b>Область значений:</b> ${range}</p>
+            <p><b>Промежуток возрастания:</b> ${increase}</p>
+            <p><b>Промежуток убывания:</b> ${decrease}</p>
+            <p><b>Промежутки знакопостоянства:</b></p>
+            ${posNeg}
         </div>`;
 
-        // 6. Свойства (Ваш запрос)
-        let rangeText = a > 0 ? `[${formatNum(y0)}; +∞)` : `(-∞; ${formatNum(y0)}]`;
-        
-        let signText = '';
-        if (D < 0) {
-             signText = a > 0 ? `y > 0 всегда` : `y < 0 всегда`;
-        } else if (Math.abs(D) < 0.0001) {
-             signText = a > 0 ? `y > 0 везде, кроме x=${formatNum(x1)}` : `y < 0 везде, кроме x=${formatNum(x1)}`;
-        } else {
-             if (a > 0) {
-                 signText = `y > 0: (-∞; ${formatNum(x1)}) и (${formatNum(x2)}; +∞)<br>y < 0: (${formatNum(x1)}; ${formatNum(x2)})`;
-             } else {
-                 signText = `y > 0: (${formatNum(x1)}; ${formatNum(x2)})<br>y < 0: (-∞; ${formatNum(x1)}) и (${formatNum(x2)}; +∞)`;
-             }
+        // 5. Таблица значений
+        let table = `<div class="step">
+            <h3>5. Таблица контрольных точек</h3>
+            <div class="table-container">
+                <table>
+                    <tr><th>x</th>`;
+        let rowY = "<tr><th>y</th>";
+        for (let i = -3; i <= 3; i++) {
+            let curX = Math.round(x0) + i;
+            table += `<td>${curX}</td>`;
+            rowY += `<td>${format(f(curX))}</td>`;
         }
+        table += `</tr>${rowY}</tr></table></div></div>`;
 
-        let monoText = '';
-        if (a > 0) {
-            monoText = `Убывает ↓: (-∞; ${formatNum(x0)}]<br>Возрастает ↑: [${formatNum(x0)}; +∞)`;
-        } else {
-            monoText = `Возрастает ↑: (-∞; ${formatNum(x0)}]<br>Убывает ↓: [${formatNum(x0)}; +∞)`;
-        }
-
-        html += `<div class="solution-step">
-            <h3>6. Исследование функции</h3>
-            <p><b>D(y):</b> (-∞; +∞)</p>
-            <p><b>E(y):</b> ${rangeText}</p>
-            <p><b>Нули:</b> ${rootsText.replace(/<[^>]*>/g, '').split(':')[1] || 'нет'}</p>
-            <p><b>Знакопостоянство:</b><br>${signText}</p>
-            <p><b>Монотонность:</b><br>${monoText}</p>
-        </div>`;
-
-        resultsDiv.innerHTML = html;
-
-        // График
-        let graphDataX = [];
-        let graphDataY = [];
-        for(let i = x0 - 5; i <= x0 + 5; i += 0.2) {
-            graphDataX.push(i.toFixed(1));
-            graphDataY.push(f(i));
-        }
-        drawChart(graphDataX, graphDataY, a);
+        area.innerHTML = html + table;
+        renderChart(f, x0);
     }
 
-    function drawChart(labels, data, a) {
-        const ctx = document.getElementById('parabolaChart').getContext('2d');
+    function renderChart(f, x0) {
+        const ctx = document.getElementById('mainChart').getContext('2d');
         if (myChart) myChart.destroy();
+
+        let labels = [];
+        let data = [];
+        for (let x = x0 - 5; x <= x0 + 5; x += 0.25) {
+            labels.push(x.toFixed(1));
+            data.push(f(x));
+        }
+
         myChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Парабола',
+                    label: 'График функции y(x)',
                     data: data,
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                    borderWidth: 2,
-                    pointRadius: 0, 
-                    fill: true,
-                    tension: 0.4
+                    borderColor: '#2563eb',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.3
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: { grid: { color: '#eee' } },
-                    y: { grid: { color: '#eee' } }
+                    x: {
+                        grid: { color: '#e2e8f0' },
+                        ticks: { maxTicksLimit: 10 }
+                    },
+                    y: {
+                        grid: { color: '#e2e8f0' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
                 }
             }
         });
     }
+
+    // Инициализация при загрузке
+    window.onload = calculate;
 </script>
 
 </body>
